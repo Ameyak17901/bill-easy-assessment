@@ -10,7 +10,15 @@ const reviewSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  rating: {
+    type: Number,
+    default: 0,
+    min: [1, "Rating must be atleast 1"],
+    max: [5, "Rating cannot exceed 5"],
+  },
 });
+
+export const Review = mongoose.model("Review", reviewSchema);
 
 const bookSchema = mongoose.Schema({
   name: {
@@ -26,7 +34,11 @@ const bookSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  reviews: [reviewSchema],
+  reviews: [{ type: reviewSchema, ref: "Review" }],
+  averageRating: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Book = mongoose.model("Book", bookSchema);
