@@ -12,10 +12,10 @@ Core Features
 
 ## Review System
 
-User authentication and authorization
-Submit and edit book reviews with ratings (1-5 stars)
-View aggregated review statistics per book
-Moderate and manage review content
+1. User authentication and authorization  
+2. Submit and edit book reviews with ratings (1-5 stars)  
+3. View aggregated review statistics per book  
+4. Moderate and manage review content  
 
 ## **API Endpoints**
 
@@ -36,7 +36,6 @@ Runtime & Framework
 
 - MongoDB with Mongoose ODM for flexible document storage
 - Optimized schemas for books, users, and reviews
-- Indexed fields for efficient querying
 
 ## Security & Validation
 
@@ -53,5 +52,7 @@ Runtime & Framework
 2. To run the project.
    ```
     npm run dev
-   ```   
+   ```
+Refer to postman documentation for examples 
+[Postman Documentation](https://www.postman.com/platform-development-team-2672/workspace/team-workspace/collection/32061324-6d34bef4-3ce2-4b29-87d6-45e21ed041bf?action=share&creator=32061324)    
 
