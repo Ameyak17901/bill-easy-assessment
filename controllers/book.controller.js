@@ -1,5 +1,4 @@
 import Book, { Review } from "../models/book.model.js";
-import mongoose from "mongoose";
 
 export const getBooks = async (req, res) => {
   const { page = 1, author = "", genre = "", limit = 10, sortBy } = req.query;
@@ -26,7 +25,7 @@ export const getBooks = async (req, res) => {
 };
 
 export const createBook = async (req, res) => {
-  const { name, author, genre, reviews } = req.body;
+  const { title, author, genre, reviews } = req.body;
 
   try {
     const averageRating = Math.abs(
@@ -36,7 +35,7 @@ export const createBook = async (req, res) => {
       )
     );
     const newBook = new Book({
-      name,
+      title,
       author,
       genre,
       reviews,
@@ -92,11 +91,11 @@ export const createReviewForBook = async (req, res) => {
         .json({ success: false, error: "No Book found, please check the id" });
     }
     const currentUser = req.user;
-    console.log(currentUser._id);
+
     const oldReview = book.reviews.filter(
       (review) => review.userId === currentUser._id
     );
-    console.log(oldReview);
+
     if (oldReview && oldReview.length > 0) {
       return res.status(400).json({
         success: false,
@@ -110,7 +109,19 @@ export const createReviewForBook = async (req, res) => {
       userId: currentUser._id,
     });
     book.reviews.push(newReview);
+    const averageRating = Math.abs(
+      book.reviews.reduce(
+        (acc, review) => (acc + Number(review.rating)) / book.reviews.length,
+        0
+      )
+    );
+    book.averageRating = averageRating;
     book.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Review created successfully.",
+    });
   } catch (error) {
     console.error("Error creating review for book", error.message);
     return res.status(500).json({
@@ -165,17 +176,26 @@ export const deleteReviewById = async (req, res) => {
   const { id } = req.params;
   try {
     const currentUser = req.user;
-    const book = await Book.findOneAndUpdate(
+    const book = await Book.findOne({ _id: id });
+    if (!book) {
+      return res.status(404).json({ success: false, error: "Book not found." });
+    }
+
+    const newBook = await Book.findOneAndUpdate(
       { _id: id },
-      { $pull: { "reviews.$[elem].userId": currentUser._id } },
-      {
-        arrayFilters: [{ "elem.userId": currentUser._id }],
-      }
+      { $pull: { reviews: { userId: currentUser._id } } }
     );
 
-    if (!book) {
-      return res.status(404).json({ success: false, error: "Book not found" });
-    }
+    await newBook.save();
+
+    // const book = await Book.findOneAndUpdate(
+    //   { _id: id },
+    //   { $pull: { "reviews.$[elem].userId": currentUser._id } },
+    //   {
+    //     arrayFilters: [{ "elem.userId": currentUser._id }],
+    //   }
+    // );
+
     return res
       .status(200)
       .json({ success: true, message: "Review deleted successfully." });

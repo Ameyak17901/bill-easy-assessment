@@ -21,7 +21,7 @@ const reviewSchema = mongoose.Schema({
 export const Review = mongoose.model("Review", reviewSchema);
 
 const bookSchema = mongoose.Schema({
-  name: {
+  title: {
     type: String,
     required: true,
     unique: true,
